@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lompat Garuda - Kuis Pancasila Interaktif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comfortaa:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Comfortaa', cursive;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDB833 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 600;
+        }
+
+        /* Stats Bar */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            gap: 30px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .star { color: #FFD700; }
+        .level { color: #FF6B35; }
+        .progress { color: #4CAF50; }
+
+        /* Main Game Area */
+        .game-area {
+            display: flex;
+            gap: 30px;
+            flex: 1;
+            margin-bottom: 20px;
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Garuda Section */
+        .garuda-section {
+            flex: 0 0 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .garuda {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .garuda.jump {
+            animation: jump 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes jump {
+            0% { transform: translateY(0) rotateZ(0deg); }
+            25% { transform: translateY(-80px) rotateZ(-5deg); }
+            50% { transform: translateY(-100px) rotateZ(5deg); }
+            75% { transform: translateY(-50px) rotateZ(-5deg); }
+            100% { transform: translateY(0) rotateZ(0deg); }
+        }
+
+        .garuda.correct {
+            animation: jump 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                       glow 0.6s ease-out;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 15px 50px rgba(76, 175, 80, 0.8); }
+            100% { box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); }
+        }
+
+        .garuda.wrong {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .garuda-label {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            color: #FF6B35;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Question Section */
+        .question-section {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sila-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            width: fit-content;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .question-text {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            border-color: #FF6B35;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 140, 66, 0.1));
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        .option-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #4CAF50;
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+            border-color: #f44336;
+            animation: shake 0.5s;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Modal Screens */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 1.2s ease-in-out infinite;
+        }
+
+        .modal-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .modal-text {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .score-display {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FF6B35;
+            margin: 20px 0;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #FF6B35, #FF8C42);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 53, 0.4);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FDB833 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 2000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .start-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .start-garuda {
+            font-size: 6rem;
+            animation: bounce 1s infinite;
+        }
+
+        .start-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .sila-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .sila-btn {
+            padding: 20px;
+            border: 4px solid white;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 15px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sila-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 1);
+        }
+
+        .sila-btn.active {
+            background: white;
+            color: #FF6B35;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 25px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Feedback Messages */
+        .feedback {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 500;
+            animation: feedbackPop 0.5s ease-out;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @keyframes feedbackPop {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .feedback.wrong {
+            background: linear-gradient(135deg, #f44336, #da190b);
+            color: white;
+            box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+            }
+
+            .garuda-section {
+                flex: 0 0 auto;
+                order: 2;
+            }
+
+            .question-section {
+                order: 1;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .start-title {
+                font-size: 2.5rem;
+            }
+
+            .sila-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .stats {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-garuda">🦅</div>
+        <h1 class="start-title">Lompat Garuda</h1>
+        <p class="start-subtitle">Pelajari Pancasila dengan cara yang seru dan interaktif!</p>
+        
+        <div>
+            <p style="color: white; font-weight: 700; margin-bottom: 15px; font-size: 1.1rem;">Pilih Sila yang ingin dipelajari:</p>
+            <div class="sila-selector" id="silaSelector">
+                <button class="sila-btn" data-sila="1">Sila 1</button>
+                <button class="sila-btn" data-sila="2">Sila 2</button>
+                <button class="sila-btn" data-sila="3">Sila 3</button>
+                <button class="sila-btn" data-sila="4">Sila 4</button>
+                <button class="sila-btn" data-sila="5">Sila 5</button>
+            </div>
+        </div>
+
+        <button class="start-btn" id="startBtn" disabled>MULAI KUIS</button>
+    </div>
+
+    <!-- Game Container -->
+    <div class="container" id="gameContainer" style="display: none;">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">🦅 Lompat Garuda</h1>
+            <p class="subtitle" id="currentSila">Sila 1: Ketuhanan Yang Maha Esa</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-icon star">⭐</span>
+                <span>Poin: <strong id="score">0</strong></span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon level">📊</span>
+                <span>Soal: <strong id="progress">1</strong>/10</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">🎯</span>
+                <span>Benar: <strong id="correct">0</strong></span>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <!-- Garuda -->
+            <div class="garuda-section">
+                <div class="garuda" id="garuda">🦅</div>
+                <p class="garuda-label">Garuda Pancasila</p>
+            </div>
+
+            <!-- Question -->
+            <div class="question-section">
+                <div class="sila-badge" id="silaBadge">Sila 1</div>
+                <p class="question-text" id="question">Loading...</p>
+                <div class="options" id="options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback" id="feedback"></div>
+
+    <!-- Modals -->
+    <!-- Level Complete Modal -->
+    <div class="modal" id="levelCompleteModal">
+        <div class="modal-content">
+            <div class="modal-icon">🎉</div>
+            <h2 class="modal-title">Selesai!</h2>
+            <p class="modal-text">Bagus sekali! Kamu telah menyelesaikan 10 soal</p>
+            <div class="score-display" id="finalScore">0</div>
+            <p class="modal-text">Jumlah Jawaban Benar</p>
+            <button class="modal-btn" onclick="goToHome()">Pilih Sila Lain</button>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API untuk sound effects
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const now = audioContext.currentTime;
+            
+            if (type === 'correct') {
+                // Melodi yang indah untuk jawaban benar
+                const freqs = [523, 659, 784]; // C, E, G
+                freqs.forEach((freq, i) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, now + (i * 0.1));
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.1) + 0.3);
+                    
+                    osc.start(now + (i * 0.1));
+                    osc.stop(now + (i * 0.1) + 0.3);
+                });
+            } else if (type === 'wrong') {
+                // Nada berderet untuk jawaban salah
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
+                
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'levelUp') {
+                // Melodi naik untuk level selesai
+                const freqs = [262, 330, 392, 523];
+                freqs.forEach((freq, i) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, now + (i * 0.15));
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.15) + 0.3);
+                    
+                    osc.start(now + (i * 0.15));
+                    osc.stop(now + (i * 0.15) + 0.3);
+                });
+            }
+        }
+
+        // Quiz Data
+        const quizData = {
+            1: {
+                name: 'Ketuhanan Yang Maha Esa',
+                color: '#FF6B35',
+                questions: [
+                    {
+                        q: 'Sila pertama Pancasila berbunyi "Ketuhanan Yang Maha Esa". Apa makna dari Sila ini?',
+                        options: [
+                            'Percaya kepada Tuhan sesuai agama dan kepercayaan masing-masing',
+                            'Hanya ada satu agama yang benar',
+                            'Tuhan tidak penting dalam kehidupan',
+                            'Manusia adalah Tuhan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Nilai apa yang paling penting dari Sila pertama?',
+                        options: [
+                            'Kebebasan memilih agama dengan saling menghormati',
+                            'Memaksa orang untuk percaya sama',
+                            'Menghapus agama dari masyarakat',
+                            'Mengikuti agama mayoritas'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara menjalankan Sila pertama dalam kehidupan sehari-hari?',
+                        options: [
+                            'Menjalankan ibadah sesuai agama dan percaya, serta menghormati agama orang lain',
+                            'Tidak perlu beribadah selama berbuat baik',
+                            'Mengganggu ibadah orang yang berbeda agama',
+                            'Memilih agama berdasarkan teman-teman'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Komitmen apa yang harus dilakukan warga negara untuk Sila pertama?',
+                        options: [
+                            'Menghargai kebebasan beragama dan bermasyarakat dengan toleran',
+                            'Melarang semua agama selain satu agama',
+                            'Tidak perlu memiliki agama apapun',
+                            'Hanya percaya pada kepercayaan lokal saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa dampak positif jika kita menjalankan Sila pertama dengan baik?',
+                        options: [
+                            'Tercipta keharmonisan dan perdamaian antar umat beragama',
+                            'Semua orang akan memiliki agama yang sama',
+                            'Agama akan hilang dari Indonesia',
+                            'Tidak akan ada manfaat sama sekali'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Siapa yang paling diuntungkan dengan adanya Sila pertama?',
+                        options: [
+                            'Semua masyarakat Indonesia yang memiliki beragam agama dan kepercayaan',
+                            'Hanya satu kelompok agama saja',
+                            'Pemerintah untuk mengendalikan rakyat',
+                            'Orang-orang yang tidak percaya apapun'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana sikap yang tepat ketika ada perbedaan agama di lingkungan kita?',
+                        options: [
+                            'Menghormati dan menghargai setiap kepercayaan yang ada',
+                            'Memaksa orang lain untuk mengikuti agama kita',
+                            'Menghindari dan tidak bermain dengan yang berbeda agama',
+                            'Mengejek kepercayaan orang lain'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Nilai spiritual apa yang diajarkan Sila pertama kepada bangsa Indonesia?',
+                        options: [
+                            'Keimanan, ketakwaan, dan kesadaran bahwa Tuhan menciptakan semua makhluk',
+                            'Bahwa Tuhan tidak ada di bumi',
+                            'Manusia tidak perlu spiritual',
+                            'Agama hanya untuk golongan tertentu'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa hubungan antara Sila pertama dengan persatuan Indonesia?',
+                        options: [
+                            'Sila pertama menjadi dasar untuk bersatu meski berbeda agama dan kepercayaan',
+                            'Tidak ada hubungan sama sekali',
+                            'Persatuan hanya bisa terjadi jika semua seagama',
+                            'Agama adalah penghalang persatuan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa yang perlu kita tingkatkan untuk lebih menjalankan Sila pertama?',
+                        options: [
+                            'Meningkatkan pemahaman agama sendiri dan menghargai kepercayaan orang lain',
+                            'Mempelajari semua agama untuk menjadi atheis',
+                            'Menolak semua bentuk kepercayaan',
+                            'Mengasingkan diri dari masyarakat multi-agama'
+                        ],
+                        correct: 0
+                    }
+                ]
+            },
+            2: {
+                name: 'Kemanusiaan yang Adil dan Beradab',
+                color: '#FF8C42',
+                questions: [
+                    {
+                        q: 'Apa makna dari Sila kedua "Kemanusiaan yang Adil dan Beradab"?',
+                        options: [
+                            'Mengakui hak dan martabat manusia dengan adil dan menghormati kemanusiaan',
+                            'Hanya beberapa orang memiliki hak',
+                            'Manusia tidak memiliki martabat',
+                            'Keadilan hanya untuk golongan kaya'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Hak asasi manusia yang diakui dalam Sila kedua adalah',
+                        options: [
+                            'Hak hidup, hak kebebasan, hak kesetaraan, dan hak bermartabat',
+                            'Hak untuk mengambil hak orang lain',
+                            'Hak untuk tidak menghormati sesama',
+                            'Hanya hak untuk kaya saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara menunjukkan kemanusiaan yang adil dan beradab dalam sekolah?',
+                        options: [
+                            'Menghormati semua teman, membantu yang kesusahan, dan tidak membeda-bedakan',
+                            'Membully teman yang berbeda',
+                            'Memilih teman hanya yang kaya',
+                            'Tidak peduli dengan kesulitan teman'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Siapa yang seharusnya mendapat perlakuan adil menurut Sila kedua?',
+                        options: [
+                            'Semua orang tanpa terkecuali, tanpa memandang ras, agama, atau latar belakang',
+                            'Hanya orang yang kaya saja',
+                            'Hanya orang yang berkuasa',
+                            'Hanya teman-teman sendiri'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa yang dimaksud dengan "beradab" dalam Sila kedua?',
+                        options: [
+                            'Berperilaku sopan, menghormati orang lain, dan mematuhi norma kemasyarakatan',
+                            'Tidak perlu bersopan santun',
+                            'Berbuat sesuka hati tanpa menghormati orang lain',
+                            'Hanya penting di depan guru saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana sikap yang tepat ketika melihat temanmu diperlakukan tidak adil?',
+                        options: [
+                            'Membelanya dan melapor ke guru atau orang tua dengan berani',
+                            'Diam saja dan tidak berbuat apa-apa',
+                            'Ikut membully temannya',
+                            'Pura-pura tidak tahu'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Nilai kemanusiaan apa yang ingin dibangun Sila kedua?',
+                        options: [
+                            'Saling menghargai, kerja sama, dan tanggung jawab bersama',
+                            'Saling membenci dan bermusuhan',
+                            'Hidup sendiri tanpa peduli orang lain',
+                            'Hanya mementingkan diri sendiri'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa tanggung jawab kita terhadap sesama berdasarkan Sila kedua?',
+                        options: [
+                            'Membantu yang membutuhkan, berbagi, dan menjaga keselamatan orang lain',
+                            'Tidak ada tanggung jawab apapun',
+                            'Hanya memperhatikan keluarga sendiri',
+                            'Membantu hanya jika ada balasan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana mengembangkan keadaban dalam bergaul dengan orang berbeda budaya?',
+                        options: [
+                            'Belajar mengenal budaya mereka dengan hormat dan menunjukkan sopan santun',
+                            'Meremehkan budaya mereka',
+                            'Tidak mau bergaul dengan mereka',
+                            'Memaksa mereka untuk mengikuti budaya kita'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa dampak positif jika semua orang menjalankan Sila kedua?',
+                        options: [
+                            'Tercipta masyarakat yang adil, damai, dan saling menghormati',
+                            'Akan ada banyak kekerasan dan pengabaian hak',
+                            'Semua orang akan menjadi kaya',
+                            'Tidak akan ada perbedaan pendapat'
+                        ],
+                        correct: 0
+                    }
+                ]
+            },
+            3: {
+                name: 'Persatuan Indonesia',
+                color: '#FDB833',
+                questions: [
+                    {
+                        q: 'Sila ketiga adalah "Persatuan Indonesia". Apa tujuan utama Sila ini?',
+                        options: [
+                            'Menyatukan seluruh rakyat Indonesia meskipun berbeda latar belakang',
+                            'Mengasingkan diri dari kelompok lain',
+                            'Memecah belah Indonesia',
+                            'Hanya menyatukan kelompok tertentu saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara mewujudkan persatuan Indonesia dalam kehidupan sehari-hari?',
+                        options: [
+                            'Menghargai perbedaan, tidak saling membeda-bedakan, dan bekerja sama demi kepentingan bersama',
+                            'Hanya berteman dengan suku sendiri',
+                            'Menolak bergaul dengan orang dari daerah lain',
+                            'Memaksakan satu budaya untuk semua'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Indonesia memiliki banyak keragaman: suku, agama, budaya, dan bahasa. Apa filosofi di balik persatuan ini?',
+                        options: [
+                            'Dari berbagai perbedaan, kita bersatu dengan semangat "Bhinneka Tunggal Ika"',
+                            'Perbedaan itu akan menyebabkan perpecahan',
+                            'Indonesia harus memiliki satu budaya saja',
+                            'Keragaman adalah kelemahan Indonesia'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa arti "Bhinneka Tunggal Ika"?',
+                        options: [
+                            'Berbeda-beda tetapi tetap satu, menunjukkan kesatuan dalam keberagaman',
+                            'Semua harus sama dan seragam',
+                            'Perbedaan tidak boleh ada',
+                            'Setiap suku harus terpisah'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa manfaat persatuan Indonesia bagi masyarakat?',
+                        options: [
+                            'Kekuatan menghadapi tantangan, pembangunan bersama, dan kemerdekaan terjaga',
+                            'Membuat Indonesia lemah',
+                            'Tidak ada manfaat apapun',
+                            'Hanya menguntungkan satu golongan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa yang seharusnya dilakukan jika ada orang yang mencoba memecah belah Indonesia?',
+                        options: [
+                            'Menolak dengan tegas dan menjaga persatuan dengan kesadaran bersama',
+                            'Membiarkan dan tidak berbuat apa-apa',
+                            'Ikut serta dalam memecah belah',
+                            'Tidak peduli dengan persatuan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara menunjukkan cinta terhadap persatuan Indonesia di lingkungan sekolah?',
+                        options: [
+                            'Menghormati teman dari berbagai daerah, tidak membully, dan bekerja sama dalam kegiatan',
+                            'Hanya berteman dengan satu kelompok saja',
+                            'Membuat kelompok yang eksklusif',
+                            'Tidak peduli dengan teman dari daerah lain'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Siapa pendiri Indonesia yang menekankan pentingnya persatuan?',
+                        options: [
+                            'Soekarno, Hatta, dan tokoh pendiri lainnya yang mengakui keragaman',
+                            'Tokoh yang ingin memecah Indonesia',
+                            'Penjajah Eropa',
+                            'Raja dari kerajaan asing'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa ancaman terbesar terhadap persatuan Indonesia?',
+                        options: [
+                            'Fanatisme sempit, kesukuan berlebihan, dan kebencian terhadap kelompok lain',
+                            'Pembangunan dan kemajuan ekonomi',
+                            'Pendidikan yang baik',
+                            'Toleransi antar umat'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana persatuan Indonesia berkembang di era digital saat ini?',
+                        options: [
+                            'Dengan memanfaatkan media sosial untuk saling memahami dan berbagi nilai kebersamaan',
+                            'Media sosial membuat Indonesia semakin terpecah',
+                            'Internet menghancurkan persatuan',
+                            'Teknologi tidak relevan dengan persatuan'
+                        ],
+                        correct: 0
+                    }
+                ]
+            },
+            4: {
+                name: 'Kerakyatan yang Dipimpin oleh Hikmat Kebijaksanaan',
+                color: '#4CAF50',
+                questions: [
+                    {
+                        q: 'Sila keempat: "Kerakyatan yang Dipimpin oleh Hikmat Kebijaksanaan dalam Permusyawaratan Perwakilan". Apa makna Sila ini?',
+                        options: [
+                            'Pemerintahan harus berdasarkan keputusan bersama melalui musyawarah yang bijaksana',
+                            'Satu orang pemimpin menentukan segalanya tanpa mendengar rakyat',
+                            'Rakyat tidak memiliki suara dalam pemerintahan',
+                            'Demokrasi tanpa musyawarah'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa arti dari "permusyawaratan" dalam konteks Sila keempat?',
+                        options: [
+                            'Proses mengambil keputusan bersama dengan mendengarkan berbagai pendapat',
+                            'Keputusan yang diambil oleh satu orang saja',
+                            'Pemungutan suara tanpa diskusi',
+                            'Permainan politik yang tersembunyi'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Siapa yang seharusnya terlibat dalam musyawarah untuk kepentingan negara?',
+                        options: [
+                            'Wakil rakyat, pemimpin, dan masyarakat melalui perwakilan mereka',
+                            'Hanya orang kaya saja',
+                            'Hanya pemimpin pemerintah',
+                            'Hanya satu partai politik'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa yang dimaksud dengan "hikmat kebijaksanaan"?',
+                        options: [
+                            'Kearifan dan pertimbangan matang dalam mengambil keputusan demi kepentingan bersama',
+                            'Keputusan yang cepat dan sembrono',
+                            'Hanya mengikuti hawa nafsu pemimpin',
+                            'Pertimbangan untuk kepentingan pribadi saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana rakyat biasa (non-pejabat) dapat berpartisipasi dalam demokrasi berdasarkan Sila keempat?',
+                        options: [
+                            'Melalui pemilihan umum, menjadi anggota organisasi, dan mengajukan aspirasi kepada wakil',
+                            'Rakyat tidak boleh terlibat dalam apapun',
+                            'Hanya bisa menonton dari jauh',
+                            'Hanya diperbolehkan membayar pajak saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa perbedaan demokrasi yang dijunjung Sila keempat dengan diktaktor?',
+                        options: [
+                            'Demokrasi melibatkan rakyat, diktatur hanya satu pemimpin berkuasa mutlak',
+                            'Tidak ada perbedaan sama sekali',
+                            'Diktatur lebih baik dari demokrasi',
+                            'Demokrasi membuat bangsa tertinggal'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara menunjukkan nilai Sila keempat di lingkungan sekolah?',
+                        options: [
+                            'Membentuk organisasi siswa yang mendengarkan aspirasi, membuat keputusan bersama',
+                            'Satu ketua OSIS menentukan semuanya tanpa mendengar suara siswa lain',
+                            'Mengabaikan musyawarah dan hanya mengikuti komando',
+                            'Tidak membuat organisasi apapun'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa tanggung jawab pemimpin berdasarkan Sila keempat?',
+                        options: [
+                            'Mendengarkan rakyat, membuat keputusan yang bijaksana, dan mengutamakan kesejahteraan rakyat',
+                            'Hanya memikirkan keuntungan pribadi',
+                            'Mengabaikan aspirasi rakyat',
+                            'Menggunakan kekuasaan untuk menindas rakyat'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana proses musyawarah untuk mufakat dalam Sila keempat?',
+                        options: [
+                            'Semua pihak berbicara, dielak sampai ditemukan kesepakatan bersama untuk kepentingan bersama',
+                            'Suara mayoritas menang, minoritas kalah',
+                            'Pemimpin memaksakan pendapatnya',
+                            'Tidak ada kesepakatan sama sekali'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa dampak jika Sila keempat dijalankan dengan baik di negara?',
+                        options: [
+                            'Pemerintahan yang stabil, adil, dan memiliki dukungan rakyat yang kuat',
+                            'Negara akan kacau dan tertinggal',
+                            'Kemiskinan akan meningkat drastis',
+                            'Tidak ada keuntungan sama sekali'
+                        ],
+                        correct: 0
+                    }
+                ]
+            },
+            5: {
+                name: 'Keadilan Sosial bagi Seluruh Rakyat Indonesia',
+                color: '#2196F3',
+                questions: [
+                    {
+                        q: 'Sila kelima: "Keadilan Sosial bagi Seluruh Rakyat Indonesia". Apa makna Sila ini?',
+                        options: [
+                            'Semua rakyat berhak mendapat perlakuan adil dalam bidang ekonomi, sosial, dan hak-haknya',
+                            'Hanya orang kaya yang berhak sejahtera',
+                            'Tidak ada keadilan untuk rakyat miskin',
+                            'Tidak semua orang berhak adil'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa dimensi keadilan sosial yang dimaksud dalam Sila kelima?',
+                        options: [
+                            'Keadilan ekonomi, pendidikan, kesehatan, dan hak-hak fundamental untuk semua',
+                            'Keadilan hanya untuk golongan atas',
+                            'Hanya keadilan dalam hukum saja',
+                            'Keadilan tidak perlu untuk semua'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara mewujudkan keadilan sosial dalam kehidupan sehari-hari?',
+                        options: [
+                            'Berbagi dengan yang kurang mampu, tidak mengucilkan, dan membantu sesama',
+                            'Hanya peduli dengan diri sendiri',
+                            'Meremehkan orang yang kurang beruntung',
+                            'Tidak mau berbagi dengan orang lain'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa peran pemerintah dalam mewujudkan keadilan sosial?',
+                        options: [
+                            'Menyediakan akses pendidikan, kesehatan, dan lapangan kerja untuk semua rakyat',
+                            'Hanya melayani rakyat yang kaya',
+                            'Tidak peduli dengan kesejahteraan rakyat',
+                            'Membuat perbedaan kelas yang semakin tajam'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Siapa saja yang berhak mendapat perlakuan adil menurut Sila kelima?',
+                        options: [
+                            'Semua rakyat Indonesia tanpa terkecuali, tidak peduli latar belakang dan status sosial',
+                            'Hanya orang yang punya uang',
+                            'Hanya orang yang berpengaruh',
+                            'Hanya kelompok tertentu saja'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa yang termasuk dalam "keadilan sosial" menurut Sila kelima?',
+                        options: [
+                            'Akses yang sama ke pendidikan, pekerjaan, kesehatan, dan kesejahteraan',
+                            'Hanya pemberian uang saja',
+                            'Semua orang harus punya uang yang sama',
+                            'Tidak perlu ada keadilan'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana sikap yang tepat terhadap orang yang lebih kurang mampu?',
+                        options: [
+                            'Menunjukkan empati, membantu jika bisa, dan tidak meremehkan',
+                            'Meremehkan dan mengejek',
+                            'Menghindari mereka',
+                            'Memandang mereka sebagai beban masyarakat'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa dampak negatif jika keadilan sosial tidak terwujud?',
+                        options: [
+                            'Kesenjangan ekonomi, kecemburuan sosial, dan potensi konflik yang meningkat',
+                            'Semua orang akan makmur',
+                            'Tidak ada dampak negatif apapun',
+                            'Semakin banyak orang yang bahagia'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Bagaimana cara berkomitmen pada keadilan sosial sebagai pelajar?',
+                        options: [
+                            'Belajar dengan giat, membantu teman yang kesusahan, dan percaya pada kesamaan hak',
+                            'Hanya fokus pada kesuksesan pribadi',
+                            'Tidak peduli dengan kesulitan orang lain',
+                            'Hanya ingin menjadi kaya sendiri'
+                        ],
+                        correct: 0
+                    },
+                    {
+                        q: 'Apa visi akhir dari Sila kelima untuk Indonesia?',
+                        options: [
+                            'Masyarakat yang sejahtera, adil, dan merata dengan kesempatan yang sama untuk semua',
+                            'Indonesia yang dikuasai segelintir orang kaya',
+                            'Kemiskinan yang semakin bertambah',
+                            'Tidak ada visi atau cita-cita apapun'
+                        ],
+                        correct: 0
+                    }
+                ]
+            }
+        };
+
+        // Game State
+        let gameState = {
+            selectedSila: null,
+            currentQuestion: 0,
+            score: 0,
+            correctAnswers: 0,
+            answered: false,
+            questions: []
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const silaButtons = document.querySelectorAll('.sila-btn');
+            const startBtn = document.getElementById('startBtn');
+
+            silaButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    silaButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    gameState.selectedSila = parseInt(e.target.dataset.sila);
+                    startBtn.disabled = false;
+                });
+            });
+
+            startBtn.addEventListener('click', startQuiz);
+        });
+
+        function startQuiz() {
+            gameState.currentQuestion = 0;
+            gameState.score = 0;
+            gameState.correctAnswers = 0;
+            gameState.questions = quizData[gameState.selectedSila].questions;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameContainer').style.display = 'flex';
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            gameState.answered = false;
+            
+            const sila = gameState.selectedSila;
+            const data = quizData[sila];
+            const question = gameState.questions[gameState.currentQuestion];
+
+            document.getElementById('currentSila').textContent = `Sila ${sila}: ${data.name}`;
+            document.getElementById('silaBadge').textContent = `Sila ${sila}`;
+            document.getElementById('silaBadge').style.background = `linear-gradient(135deg, ${data.color}, ${adjustColor(data.color, 50)})`;
+
+            document.getElementById('question').textContent = question.q;
+            document.getElementById('progress').textContent = `${gameState.currentQuestion + 1}/10`;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index) {
+            if (gameState.answered) return;
+
+            gameState.answered = true;
+            const question = gameState.questions[gameState.currentQuestion];
+            const isCorrect = index === question.correct;
+
+            const optionButtons = document.querySelectorAll('.option-btn');
+            
+            optionButtons.forEach((btn, i) => {
+                btn.classList.add('disabled');
+                if (i === question.correct) {
+                    btn.classList.add('correct');
+                } else if (i === index && !isCorrect) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (isCorrect) {
+                gameState.score += 10;
+                gameState.correctAnswers += 1;
+                playSound('correct');
+                showFeedback('✅ Benar!', 'correct');
+                
+                // Garuda jump
+                const garuda = document.getElementById('garuda');
+                garuda.classList.remove('correct', 'wrong');
+                void garuda.offsetWidth; // Force reflow
+                garuda.classList.add('correct');
+            } else {
+                playSound('wrong');
+                showFeedback('❌ Salah!', 'wrong');
+                
+                // Garuda shake
+                const garuda = document.getElementById('garuda');
+                garuda.classList.remove('correct', 'wrong');
+                void garuda.offsetWidth;
+                garuda.classList.add('wrong');
+            }
+
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('correct').textContent = gameState.correctAnswers;
+
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            gameState.currentQuestion++;
+
+            if (gameState.currentQuestion >= 10) {
+                endLevel();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function endLevel() {
+            playSound('levelUp');
+            document.getElementById('finalScore').textContent = gameState.correctAnswers;
+            document.getElementById('levelCompleteModal').classList.add('show');
+        }
+
+        function goToHome() {
+            document.getElementById('levelCompleteModal').classList.remove('show');
+            document.getElementById('gameContainer').style.display = 'none';
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.querySelectorAll('.sila-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback show ${type}`;
+
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+
+        function adjustColor(color, amount) {
+            const usePound = color[0] === "#";
+            const col = usePound ? color.slice(1) : color;
+            const num = parseInt(col, 16);
+            const r = Math.min(255, (num >> 16) + amount);
+            const g = Math.min(255, (num >> 8 & 0x00FF) + amount);
+            const b = Math.min(255, (num & 0x0000FF) + amount);
+            return "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+    </script>
+</body>
+</html>
